@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: co.inter.piggies
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [app-name, assertj, awaitility, data, data-jpa, hibernate-jpa, hibernate-jpamodelgen, http-client-test, jakarta-data, java, java-application, jdbc-hikari, jspecify, junit, junit-params, kafka, logback, lombok, management, maven, maven-enforcer-plugin, micronaut-aot, micronaut-configuration-validation-gradle-plugin, micronaut-http-validation, micronaut-processing-compiler-args, netty-server, postgres, problem-json, readme, serialization-jackson, shade, static-resources, testcontainers, validation, yaml, yaml-build]

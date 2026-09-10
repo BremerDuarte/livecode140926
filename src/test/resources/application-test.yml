@@ -1,0 +1,3 @@
+# PostgreSQL and Kafka coordinates are not configured here: they are only known once the
+# containers are up, so co.inter.piggies.support.AbstractContainerTest supplies them at runtime
+# from the running containers.
