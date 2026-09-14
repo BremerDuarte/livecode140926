@@ -1,0 +1,1 @@
+Dev B — Withdraw (BRA): hold, confirm, cancel. Reserva sobre balanceMinor/heldMinor, idempotência por transferId. Demo sem A e C: produzir AuthorizeDebit no tópico → sai DebitAuthorized e o hold aparece no Postgres de BRA; reentregar a mesma mensagem → um único Hold; saldo insuficiente → DebitRejected

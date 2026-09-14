@@ -1,0 +1,36 @@
+estamos implementando uma feature, contrat frist, preciso seperar os contratos.
+
+## STP — Sistema de Transferência de Porquinhos
+
+Piggie é a nova stablecoin do Inter. O desafio é implementar o Sistema de Transferência de Porquinhos (STP).
+
+A transferência envolve algumas etapas:
+
+1. Autorizar o débito dos porquinhos na conta de origem -
+2. Autorizar o crédito dos porquinhos na conta de destino -
+3. Confirmar as operações de débito e crédito nos respectivos microsserviços -
+
+Vocês devem implementar 3 serviços:
+
+- **PiggiesTransactionCoordinator** é o ponto de entrada do App e orquestra a transação de ponta a ponta.
+- **PiggiesWithdrawService** e **PiggiesDepositService**
+ autorizam e confirmam débito e crédito. Por exigência das leis de tratamento de dados internacionais,
+  cada país deve possuir uma instância de base de dados isolada. Ou seja, `Withdrawn` em BRA e `Deposit` em USA são instâncias separadas do mesmo serviço.
+
+
+{
+"originAccountKey": "string" // uuid
+"piggyCoin": "number",
+"idempotencyKey": "string",
+"destinyAccountKey": "string" //uuid
+}
+
+{
+"accountKey": "string" // uuid
+"piggyCoin": "number",
+"idempotencyKey": "string",
+}
+
+
+- me ajude a definir os 3 primeiros contratos para esses três serviços.
+- fiz esses esboços, para algo inicial
