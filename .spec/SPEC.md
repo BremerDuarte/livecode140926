@@ -10,7 +10,6 @@ O App do Inter transfere Piggies entre contas de países distintos, com débito 
 POST /transfers                 Req: {fromAccount, fromCountry, toAccount, toCountry, amountMinor, idempotencyKey}
                                 202 {transferId, status:PENDING}  | 400 problem+json
 GET  /transfers/{transferId}    200 {transferId, status, step, failureReason?, updatedAt}
-POST /accounts (demo/seed)      201 {accountId, country, balanceMinor}
 ```
 `status: PENDING | DEBIT_AUTHORIZED | CREDIT_AUTHORIZED | COMPLETED | FAILED | COMPENSATED`
 
@@ -41,16 +40,20 @@ Dinheiro sempre `long amountMinor` (centésimos de Piggie). Nunca `double`.
 - [ ] Autorização sem resposta em 5s → `FAILED` com `failureReason=TIMEOUT` + compensação do que já foi autorizado.
 - [ ] Testes: unitários da máquina de estados da saga e das regras de saldo/hold; integração com Testcontainers (Postgres + Kafka) cobrindo os 3 primeiros critérios.
 
-## 4. FATIAS (cada uma atravessa os 3 serviços, demonstrável isolada)
-1. **Happy path multi-país** — `POST /transfers` → 202; Coordinator publica `AuthorizeDebit` (BRA) → `AuthorizeCredit` (USA) → `Confirm*`; `GET /transfers/{id}=COMPLETED`, saldos corretos nos dois bancos. *Demo:* 1 POST + 1 GET + `select` nos dois Postgres.
-2. **Rejeição e compensação** — `DebitRejected` por saldo insuficiente → `FAILED` sem tocar no Deposit; `CreditRejected` após débito autorizado → `CancelDebit` → `COMPENSATED`. *Demo:* dois cenários de erro, saldos inalterados ao final.
-3. **Idempotência, retry e timeout** — chave única por `transferId` em Hold/PendingCredit, `idempotencyKey` no Coordinator, timeout de autorização com compensação. *Demo:* replay manual da mesma mensagem Kafka + POST duplicado; saldo e estado estáveis.
+## 4. FATIAS (contrato congelado primeiro → 3 devs em paralelo, sem bloqueio)
+**Minuto 0, juntos (15 min):** records de comando/evento, nomes de tópicos e `amountMinor` num pacote `contracts` compartilhado. Congelado isso, ninguém espera ninguém — cada fatia sobe e se demonstra sozinha contra o Kafka.
+1. **Dev A — Coordinator: borda async + saga.** `POST /transfers` (202), persistência do `Transfer`, máquina de estados e timeout. *Demo sem B e C:* POST → 202; `kafka-console-consumer` mostra `AuthorizeDebit`; injetar `DebitAuthorized`/`CreditAuthorized`/`DebitRejected` por `kafka-console-producer` e ver `GET /transfers/{id}` caminhar até `COMPLETED`/`FAILED`/`COMPENSATED`.
+2. **Dev B — Withdraw (BRA): hold, confirm, cancel.** Reserva sobre `balanceMinor`/`heldMinor`, idempotência por `transferId`. *Demo sem A e C:* produzir `AuthorizeDebit` no tópico → sai `DebitAuthorized` e o hold aparece no Postgres de BRA; reentregar a mesma mensagem → um único `Hold`; saldo insuficiente → `DebitRejected`.
+3. **Dev C — Deposit (USA): pending credit, confirm.** Mesmo desenho do crédito, datasource e consumer group próprios. *Demo sem A e B:* produzir `AuthorizeCredit` → `CreditAuthorized`; conta inexistente → `CreditRejected`; `ConfirmCredit` duplicado → saldo creditado uma só vez.
+
+**Integração (últimos 10 min, quem terminar primeiro):** os 3 serviços + Postgres/Kafka via Testcontainers; happy path BRA→USA e o cenário de compensação viram um teste de integração único.
 
 ## 5. RISCOS / AMBIGUIDADES (decisão default)
 - **Sem 2PC.** Adoto saga orquestrada com compensação (`CancelDebit`); a janela entre débito confirmado e crédito confirmado é resolvida por retry idempotente, não por rollback.
 - **Câmbio BRA↔USA não especificado.** Assumo paridade 1:1 e mesmo `amountMinor` nas duas pontas; FX fica fora do escopo.
 - **"Instância isolada por país".** Interpreto como um processo + um banco por (serviço, país). No live code: mesmo artefato Maven, ambientes `coordinator | withdraw-bra | deposit-usa`, cada um com seu datasource e seu grupo de consumo — fronteira por configuração, não por repositório.
-- **Origem dos saldos.** Não há cadastro no enunciado; exponho `POST /accounts` apenas para seed/demo, marcado como não-produtivo.
+- **Origem dos saldos.** Não há cadastro no enunciado e não crio endpoint para isso: contas são pré-existentes, carregadas por `import.sql` em cada instância e por fixture nos testes. Onboarding de conta está fora do STP.
+- **Trabalho paralelo depende do contrato.** Mudar um record de mensagem no meio quebra as três fatias de uma vez; o pacote `contracts` só muda por acordo explícito, e campo novo entra como opcional (nunca renomear/remover durante a hora).
 - **Confirmação parcial.** Se `ConfirmCredit` falhar após `ConfirmDebit`, não desfaço: retry infinito com backoff e alerta (dinheiro já saiu); reverter criaria crédito fantasma.
 - **Entrega at-least-once do Kafka.** Toda escrita é idempotente por `transferId`; sem transações Kafka (exactly-once) para caber em 1h.
 - **Schema.** Mantenho `hbm2ddl=update` do skeleton; Flyway seria o certo em produção.
