@@ -52,3 +52,6 @@ Faça o plano de implementação da primeira fatia da @.spec/SPEC.md, e salve em
     KISS primeiro → SOLID no REFACTOR → DRY quando o padrão estabilizou.
 
   - Crie testes unitários.
+========================================
+FAça a implementação do plano @.spec/fatia1.md. Não altere contratos, não toque em outros arquivos. Faça exatamente o que está no plano.
+  Para melhor contexto, leia a spec @.spec/SPEC.md e os prompts usados @prompts/prompt1.txt
