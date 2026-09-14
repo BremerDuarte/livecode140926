@@ -54,7 +54,7 @@ class PostgresContainerTest extends AbstractContainerTest {
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery(
                         "select count(*) from information_schema.tables"
-                                + " where table_schema = 'public' and table_name = 'piggy'")) {
+                                + " where table_schema = 'public' and table_name = 'transfers'")) {
 
             assertThat(result.next()).isTrue();
             assertThat(result.getInt(1)).isEqualTo(1);

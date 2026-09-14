@@ -40,3 +40,18 @@ Você é um sênior staff software engineer e meu par em um live code de 1hora, 
 remova o post POST /accounts e altere as fatias para serem realizadas de forma assíncrona por mais de um dev.
 
 =========================================
+Faça o plano de implementação da primeira fatia da @.spec/SPEC.md, e salve em um arquivo chamado fatia1.md
+  Stack: STACK: Java 25 + Micronaut 5.1.3 (Netty) + Hibernate/JPA + PostgreSQL + Kafka + Maven + Lombok
+    Regras:
+  - Crie uma feature separada para o serviço (feature-sliced)
+  - Separe em camadas (domain, application, infrastructure)
+  - Não faça abstrações prematuras
+
+    Siga a hierarquia de implementação:
+    Hierarquia de implementação
+    KISS primeiro → SOLID no REFACTOR → DRY quando o padrão estabilizou.
+
+  - Crie testes unitários.
+========================================
+FAça a implementação do plano @.spec/fatia1.md. Não altere contratos, não toque em outros arquivos. Faça exatamente o que está no plano.
+  Para melhor contexto, leia a spec @.spec/SPEC.md e os prompts usados @prompts/prompt1.txt
