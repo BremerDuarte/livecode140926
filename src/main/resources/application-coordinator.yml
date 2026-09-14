@@ -1,0 +1,20 @@
+micronaut:
+  server:
+    port: 8080
+datasources:
+  default:
+    url: jdbc:postgresql://localhost:5432/coordinator
+    username: piggies
+    password: piggies
+    driver-class-name: org.postgresql.Driver
+    db-type: postgres
+    dialect: POSTGRES
+jpa:
+  default:
+    entity-scan:
+      packages:
+        - co.inter.piggies.coordinator.domain
+piggies:
+  coordinator:
+    saga-timeout: 5s
+    sweep-interval: 1s

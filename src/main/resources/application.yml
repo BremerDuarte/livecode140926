@@ -1,18 +1,16 @@
 micronaut:
   application:
     name: livecode140926
-datasources:
-  default:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: ''
-    driver-class-name: org.postgresql.Driver
-    db-type: postgres
-    dialect: POSTGRES
 jpa:
   default:
     properties:
       hibernate:
         hbm2ddl:
           auto: update
-jpa.default.properties.hibernate.hbm2ddl.auto: update
+kafka:
+  bootstrap:
+    servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  producers:
+    default:
+      acks: all
+      enable.idempotence: true
