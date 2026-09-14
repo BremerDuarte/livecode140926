@@ -1,0 +1,37 @@
+Você é um sênior staff software engineer e meu par em um live code de 1hora, produza um SPEC.md de no máximo 1 página.
+
+  DESAFIO:
+  STP — Sistema de Transferência de Porquinhos
+
+  Piggie é a nova stablecoin do Inter. O desafio é implementar o Sistema de Transferência de Porquinhos (STP).
+
+  A transferência envolve algumas etapas:
+
+  1. Autorizar o débito dos porquinhos na conta de origem
+  2. Autorizar o crédito dos porquinhos na conta de destino
+  3. Confirmar as operações de débito e crédito nos respectivos microsserviços
+
+  Vocês devem implementar 3 serviços:
+
+  - PiggiesTransactionCoordinator é o ponto de entrada do App e orquestra a transação de ponta a ponta.
+  - PiggiesWithdrawService e PiggiesDepositService autorizam e confirmam débito e crédito. Por exigência das leis de tratamento de dados internacionais, cada país deve possuir uma instância de base de dados isolada. Ou seja, Withdrawn em BRA e Deposit em USA são instâncias separadas do mesmo serviço.
+
+  STACK: Java 25 + Micronaut 5.1.3 (Netty) + Hibernate/JPA + PostgreSQL + Kafka + Maven + Lombok
+
+  Gere exatamente estas seções, nesta ordem:
+
+  1. OBJETIVO — 1 frase: quem usa e para quê.
+  2. CONTRATOS — assinaturas de endpoints/funções públicas e os
+     tipos/entidades principais. Formato compacto, sem prosa.
+  3. CRITÉRIOS DE ACEITE — checkboxes, cada um testável e com
+     entrada → saída esperada.
+  4. FATIAS  — 3 fatias, cada uma
+     end-to-end e demonstrável isolada, para cada serviço.
+  5. RISCOS / AMBIGUIDADES — o que o enunciado não deixa claro e
+     qual decisão você tomaria por padrão.
+
+  REGRAS:
+  - Máximo de 1 página
+  - Testes unitários e de integração são obrigatórios.
+  - Todo serviço de borda precisa
+    trabalhar de forma assíncrona
